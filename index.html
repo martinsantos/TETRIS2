@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Tetris Mejorado con Piezas Aleatorias</title>
+    <title>Tetris Mejorado con Piezas Reflejadas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <style>
@@ -25,7 +25,7 @@
             align-items: flex-start;
             justify-content: center;
             margin-top: 20px;
-            flex-wrap: nowrap;
+            flex-wrap: wrap; /* Permite que los elementos se ajusten en dispositivos móviles */
         }
         #game-wrapper {
             position: relative;
@@ -212,7 +212,7 @@
             '#f1c40f', // Amarillo
             '#e67e22', // Naranja
             '#1abc9c', // Turquesa
-            '#ff69b4', // Rosa para piezas aleatorias
+            '#ff69b4', // Rosa para piezas espejo
         ];
 
         let dropCounter = 0;
@@ -282,45 +282,31 @@
                     [0, 7, 7],
                     [0, 0, 0],
                 ];
-            } else if (type === 'random') {
-                return createRandomPiece();
+            } else if (type === 'L_mirror') {
+                return [
+                    [0, 8, 0],
+                    [0, 8, 0],
+                    [8, 8, 0],
+                ];
+            } else if (type === 'J_mirror') {
+                return [
+                    [0, 8, 0],
+                    [0, 8, 0],
+                    [0, 8, 8],
+                ];
+            } else if (type === 'S_mirror') {
+                return [
+                    [6, 6, 0],
+                    [0, 6, 6],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'Z_mirror') {
+                return [
+                    [0, 7, 7],
+                    [7, 7, 0],
+                    [0, 0, 0],
+                ];
             }
-        }
-
-        function createRandomPiece() {
-            const size = 4;
-            const matrix = Array.from({ length: size }, () => Array(size).fill(0));
-            const positions = [];
-
-            let x = Math.floor(Math.random() * size);
-            let y = Math.floor(Math.random() * size);
-            matrix[y][x] = 8;
-            positions.push({ x, y });
-
-            for (let i = 0; i < 3; i++) {
-                const adjacents = [];
-                positions.forEach(pos => {
-                    const dirs = [
-                        { x: pos.x + 1, y: pos.y },
-                        { x: pos.x - 1, y: pos.y },
-                        { x: pos.x, y: pos.y + 1 },
-                        { x: pos.x, y: pos.y - 1 },
-                    ];
-                    dirs.forEach(dir => {
-                        if (dir.x >= 0 && dir.x < size && dir.y >= 0 && dir.y < size && matrix[dir.y][dir.x] === 0) {
-                            adjacents.push(dir);
-                        }
-                    });
-                });
-                if (adjacents.length === 0) {
-                    break;
-                }
-                const newPos = adjacents[Math.floor(Math.random() * adjacents.length)];
-                matrix[newPos.y][newPos.x] = 8;
-                positions.push(newPos);
-            }
-
-            return matrix;
         }
 
         function drawMatrix(matrix, offset, ctx) {
@@ -439,14 +425,9 @@
         }
 
         function getNextPiece() {
-            const pieces = 'ILJOTSZ';
-            const useRandomPiece = Math.random() < 0.3; // 30% de probabilidad
-            if (useRandomPiece) {
-                return createPiece('random');
-            } else {
-                const type = pieces[Math.floor(Math.random() * pieces.length)];
-                return createPiece(type);
-            }
+            const pieces = ['I', 'L', 'J', 'O', 'T', 'S', 'Z', 'L_mirror', 'J_mirror', 'S_mirror', 'Z_mirror'];
+            const type = pieces[Math.floor(Math.random() * pieces.length)];
+            return createPiece(type);
         }
 
         function playerReset() {
